@@ -1,0 +1,293 @@
+** Intro
+Alright! So this is the incomplete documentation for Justice Battle Engine. Hopefully I can do something
+like CYF does and have a documentation website/forum, but right now I need to finish the actual engine.
+
+Note: You should probably have some programming experience before trying to build a fangame. It can't
+write code for you, sorry
+
+** Completion of engine
+The engine is around 20% complete. It's nowhere near a polished state ;-;
+The final goal for this engine is to be able to make fights with low-level enemies like a Whimsun
+AND bossfights like ones with TA!Dust!Sans. It's original purpose was meant to be as game-accurate
+as possible, and JBE actually predates Team Ashes by a wide timeframe
+
+AS OF V0.0.1, I DO NOT RECOMMEND MAKING FANGAMES WITH THIS ENGINE.
+Not that anyone's going to even realize this engine exists lmao
+BUT IF YOU'RE THINKING ABOUT IT PLEASE DON'T.
+Wait until at least v0.1.0 or something!
+
+** usage of ai
+i didn't use ai!!
+also um any pull requests that use ai-generated code will not be merged
+on that note, pull requests will be accepted as long as you're improving the engine!
+if it takes me a while to merge them i'm sorry lmao
+
+** NXTale usage
+however, i may have stolen some code from NXtale. it's on my to-do list to rewrite this code from scratch lmao
+because i really don't feel comfortable stealing code from people. although NXTale is probably one of the
+most incredible projects I've ever seen, don't get me wrong.
+so without any more yapping on my part, here's the real documentation:
+
+** The various objects used ingame
+battleManager -- the object that draws (most) of what you see on screen.
+It controls 90% of everything, like all the ui, soul movement, attacks, etc. It's by far the most
+important thing in this whole engine.
+blueSoulController -- a remnant from my failed attempt to implement a blue SOULmode. you can probably
+ignore this.
+duster -- another remnant from another failed attempt to make a sprite duster. you can ignore this too.
+fader -- used as the last component for the Game Over screen. fades in the battle.
+fullscreenManager -- this should probably be moved into battleManager. simply toggles fullscreen
+when f4 is pressed.
+gameOverController -- when instantiated, moves through the Game Over process. needs to be put through
+testing.
+krController -- this controls your KR. It's based mainly off of a Reddit thread and therefore probably
+very inaccurate. it needs to be verified for accuracy.
+objshard -- used in gameOverController as the shard. it's...completely stolen from nxtale. um. anyway.
+textManager -- the HIGHLY inefficient method of drawing text. I'm 99.999999% sure this has a memory leak
+because i'm 99.999999% sure this causes the weird crash i mentioned in my todo. it's weird and mangled
+and REALLY not good. needs to be completely rewritten.
+
+aand that's about it for objects. moving on.
+
+** Rooms used
+Right now, there's only 2 rooms:
+battle -- This is where the player will be 99% of the time. I suppose you could duplicate this and
+add different battleManagers for each phase if you wanted more organization, but if not, this will
+be where the bulk of the code is run.
+room_gameover -- gameOverController uses this as a seperate room because it's a lot easier to
+reinitialize the battleManager by just doing it in a new room. i suppose it's not COMPLETELY neccesary
+but it should probably be used
+
+** Naming conventions
+Now's probably a good time to mention that i'm HORRIBLE with naming conventions. You'll see a mix of
+camelCase, whatever_this_is_called, and thishorriblething.
+i'm sorry
+
+** Scripts
+box_collision -- calculates if two boxes are colliding. return type: bool
+setBlueSoulCoords -- shorthand for setting the coordinates of the blue soul. it's unused. return type: none
+sine -- function for the sine wave. i KNOW i took this from a thread but i can't remember which one ;-;
+EDIT: I FOUND IT https://gm48.net/resource/33/sine-waves-make-your-game-prettier
+slice -- draws the slicing animation
+target -- draws the bar thingie on the judger
+
+** Fonts
+damagef -- Hachicro! You can find it at https://fontmeme.com/fonts/hachicro-font/
+dtf AND dtf_sans -- The font's called Determination (11/10 for creativity) and you can find it at https://www.dafont.com/determination.font
+mnc: Mars Needs Cullingus: used for the name, lv, and hp. you can find it at https://fontmeme.com/fonts/mars-needs-cunnilingus-font/
+sans_battle: used for sans' dialog. you can find it at https://fontstruct.com/fontstructions/show/1534860/pixel-comic-sans-undertale-sans-font
+
+alright! now that i've gone over most of the objects i'm going to start talking about how you can use the engine!!
+
+** How to use the engine
+Okay! So first, you're probably going to want to change the icon and display name and stuff. This is pretty simple.
+Go to Quick Access (in the Asset Browser, at the top) > Game Options > target platform
+note: this was only tested on windows x64 so like i'm not confident it works everywhere
+So you can just go through and change all the values to whatever you want. that's pretty simple.
+next you're going to want a fight. I'll start simple:
+
+* Changing the player's name and stats
+So! In battleManager (Create event), there's code that looks like this:
+```gml
+player_name = "Chara";
+player_lv = 19;
+```
+Changing things like the player's ATK will only work in the Step event because they're recalculated every frame.
+So here you can set the name to whatever. although note that the values were designed around a five-letter name.
+so they're only going to display properly with a five-letter name. it CAN do other things it's just going to
+be a little less accurate. this'll be updated soon.
+
+* Changing the enemy stats
+In battleManager (Create event), there's more code that looks like this:
+```gml
+enemy_name = "Classic!Sans";
+check_msg = "SANS 1 ATK 1 DEF\nThe easiest enemy.\nCan only deal 1 damage."
+enemy_hp = 1;
+enemy_maxhp = 1;
+enemy_atk = 1;
+enemy_def = 1;
+```
+guess what, you can change these too. make sure they're the correct type though.
+
+* Changing the enemy sprite
+So this is a little more complicated. I've included some default animations (that MIGHT be accurate to Undertale?)
+but they're probably not what you want. I'll go over changing the animations later, though. The sprites used
+are in Sprites/sans. There's body_normal, head_normal, and legs_normal. This is what is used in the fight.
+Some other ones are included, like head_sweat, his Spriters Resource spritesheet, the shock thing, etc. You
+can update these with your sprites, although if they're different sizes, you'll have to change some values
+in battleManager (Create event). Specifically, this block of code:
+```gml
+head_x = 320;
+head_y = top_wall_y - 129;
+head_xstart = 320;
+head_ystart = top_wall_y - 129;
+body_x = 320;
+body_y = top_wall_y - 78;
+body_xstart = 320;
+body_ystart = top_wall_y - 78;
+legs_x = 323;
+legs_y = top_wall_y - 40;
+```
+These are the positions of Sans' stuff. You'll want to change both <part>_x/y and <part>_xstart/ystart. This is
+because they're used in some of his animation code. Once you've updated the sprites and changed the locations,
+you should be able to run the game and see your changes!
+
+NOTE: The sprites are drawn at a 2x scale in the DRAW event.
+`draw_sprite_ext(legs_normal, 0, legs_x, legs_y, 2, 2, 0, c_white, 1);`
+                                                 ^ See these 2's? that means 2x scale on the x and y.
+If your sprites are the correct width and height, you can and probably should set that to 1.
+
+* Animations
+There's a very simple method of animation used here: I just made a list with how the sprite should
+move frame-by-frame lmao. You can see this in battleManager:
+`dodgeAnim = [0, -12, -12, ...]`
+and it just uses that to animate sprites. There's probably better ways to do this but I'm really not
+the best programmer. However, if you DO want to do it this way, here's how I implemented it:
+```gml
+if (dodging and animIndex <= array_length(dodgeAnim) - 1) {
+	legs_x += dodgeAnim[animIndex];
+	body_x += dodgeAnim[animIndex];
+	head_x += dodgeAnim[animIndex];
+	animIndex += 1;
+}
+```
+yea it's just 6 lines of code
+So what this does is it first checks if `dodging` is true. If it is, and the animation index (the position
+in the list) isn't finished, it adds the current frame's x to the sprite x's and then increases the animation
+index. This should be pretty easy to adapt to whatever you want to.
+Note this only supports one-direction animations. Adding animations in more than one directions would be trivial
+(you could just use a tiny list with [x, y] as each element in the animation and modify the loop to use that)
+but since there's no use case for that here, it's not implemented.
+
+* Resizing the arena
+Alright. So. I'm a little embarrased about this but the arena's code is barely, and i mean BARELY functional.
+I really don't know why the collisions even work, and they probably shouldn't. I'm going to rewrite them soon
+using objects instead of drawing rectangles! But for now it's....okay. so i'll leave it in until i've finished
+other things.
+
+Here's how it works:
+There's three different states the arena can be in: resizing the width, resizing the height, and not moving.
+You can cause a change by doing this
+```gml
+target_arena_width = 565;
+target_arena_height = 130;
+resizing_state = "height";
+```
+In Undertale, the height is always resized first, so you put the state as "height". You don't have to do anything
+after that, it's just these lines of code that'll resize it.
+
+* Moving the arena
+You CAN move the arena. but i do NOT recommend it.
+```gml
+arena_center_x = 67;
+arena_center_y = 41;
+```
+The above code will move the arena's center to x:67 and y:41. Be sure to move it back when you're done, though!
+
+* Rotating the arena
+This is simply not possible.
+It should be possible in a future version, though!
+
+* Creating text
+Text can be created using the TextManager. Like most things, the TextManager is code that barely works.
+shhhhhhhhh
+First, you'll need a textManager instance. It can be created like this:
+`textMgr = instance_create_depth(-100, -100, -9998, textManager);`
+This doesn't seem to work more than once.
+...Really not sure why.
+But anyway, here's the usage:
+textMgr.createText(
+    tx: The top left X coordinate of the text.
+	ty: The top left Y coordinate of the text.
+	textSpd: How fast the text goes. A value of 30 would mean it draws 30 characters per second. Undertale
+	draws text at 30 characters per second.
+	font: What font to use.
+	active: When creating this, MAKE SURE TO SET THIS TO TRUE!
+	text: The actual text to draw. ex: "* FWEUICMHWUIECFMUIWMUEY!!!!!!!!!!"
+) => Returns the index of the created text value in texts(array).
+This simply draws text at {textSpd} fps
+
+textMgr.createTextInstant(
+	tx: The top left X coordinate of the text.
+	ty: The top left Y coordinate of the text.
+	font: What font to use.
+	active: When creating this, MAKE SURE TO SET THIS TO TRUE!
+	text: The actual text to draw. ex: "F7362U732R928R839I848E828S893:30981"
+	[useAsterisk]: True by default; you don't have to pass this argument. If you put false it won't draw an asterisk
+) => Returns the index of the created text value in textsi(array).
+Same as createText() but it's instant.
+
+textMgr.createDamageText(
+	tx: The top left X coordinate of the text.
+	ty: The top left Y coordinate of the text.
+	active: When creating this, MAKE SURE TO SET THIS TO TRUE!
+	text: The actual text to draw. ex: "* F4E4M7T6A98N9Y09L"
+	color: the color (e.x. c_red)
+	alpha: The opacity of the text (e.x. 0.5 for half opacity)
+	animate: If true, it will animate the damage text using Undertale's animation
+	center: If true, it will center the text based on the X coordinate
+) => Returns the index of the created text value in textsd(array).
+Creates damage text (e.x. "9999999" or "MISS" or "BLOCKED" or something)
+
+textMgr.createPagedText(
+	tx: The top left X coordinate of the text.
+	ty: The top left Y coordinate of the text.
+	textSpd: How fast the text goes. A value of 30 would mean it draws 30 characters per second. Undertale
+	draws text at 30 characters per second.
+	font: What font to use.
+	active: When creating this, MAKE SURE TO SET THIS TO TRUE!
+	text: The actual text to draw. ex: "F6M7!8F8A8N8D9O0M0S0W9A9P"
+	color: the color (e.x. c_red)
+	asterisk: true: will draw asterisk, false: will not
+	xsep: how much the characters should be seperated on the x axis in pixels
+	ysep: how much space a newline should be
+	[skippable]: true by default. if set to false you can't skip it.
+	^ I lied. you can due to a bug. It'll get fixed soon though
+	[voicebeep]: empty by default. you can set this to a voice beep to play when a new character is drawn.
+) => Returns the index of the created text value in textsp(array).
+Used to create text with multiple pages (e.x. "SANS 1 ATK 1 DEF" and then "Can't keep dodging forever.").
+Or dialogs and stuff. there's a lot of use cases!
+
+Finally, you have six helper functions:
+get_texts() : Returns the texts array.
+get_textsi() : Returns the textsi array.
+get_textsd() : Returns the textsd array.
+get_textsp() : Returns the textsp array.
+getPageIndex(text_index) : Returns the page index on paged texts.
+clear_all_text() : Clears all text currently being drawn. Doesn't return anything.
+
+You can use the helper functions like this:
+For example, what if you have to delete some text? You can do:
+`textMgr.get_texts<none/i/d/p>()[text_index][4] = false;`
+where text_index is the return value of create<none/Instant/Damage/Paged>Text().
+Is this good code? Nope! Does it work? Yyyyyes! So like whatever. or something.
+
+* Attacks
+Attacks are pretty easy. As of v0.0.1 you can make a bone.
+Yep. That's it. And it has to be upright or else it doesn't work.
+i'm the best programmer on earth
+Here's how you can make an attack:
+createBoneAttack(
+	bonex: The top left X coordinate of the bone.
+	boney: The top left Y coordinate of the bone.
+	bonelength: How long the bone is in pixels
+	bonexspeed: How fast the bone moves on the x-axis
+	(e.x. -15 for left movement, 15 for right movement, and 0 to stay still)
+	boneyspeed: How fast the bone moves on the y-axis
+	(e.x. -15 for up movement, 15 for down movement, and 0 to stay still)
+) => Returns the index of the created bone in attacks(array).
+This is updated in the draw event.
+Here's a good place to talk about how damage and KR works in JBE:
+Most of the logic for Karma Retribution is found inside krController. You can apply it like this:
+`krCon.ApplyKR(6);`
+where krCon is an instance of krController. Damage is applied by bones like this:
+If you've played the Sans fight a lot, you'll notice that bones do a lot more damage when they first hit you.
+honestly i thought i was just imagining this before seeing u/Warlock_D's analysis, but nope, it actually does!
+Every attack has a property called `innate_karma`. This is how much HP is convertzd into KR on the first frame.
+After the first frame the `innate_karma` is set to 1. `innate_karma` is always the applied karma, no matter what.
+You can see this logic in the Draw event. It's a loop right after `damagedThisFrame = false;`.
+
+* Unfinished
+This documentation is largely unfinished. But I want to get v0.0.1 out so I can work on TA!Dusttale's GameJolt
+art. so like, i'll update it later?
+anyway if you've actually read all of this or even if you just skipped to the end ily ;3

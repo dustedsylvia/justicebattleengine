@@ -1,0 +1,5 @@
+UNDERTALE by Toby Fox and Temmie Chang
+NXTALE by Daniela and Vultumast (very rarely used)
+Sans sprite sheet from Spriters Resource
+Undertale Mod Tool for extracting sprites/sounds from Undertale
+u/Warlock_D for their in depth analysis of Karma Retribution (https://www.reddit.com/r/Underminers/comments/4jwlqr/comment/d3e2u04/)

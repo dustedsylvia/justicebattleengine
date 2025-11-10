@@ -1,0 +1,53 @@
+Making a superaccurate battle engine is difficult. Recording the frames for pixel perfect
+analysis is near impossible without modding the game you want to record. Luckily, we have
+access to this game and GameMaker actually comes with a way to dump every frame to PNGs.
+Thanks GameMaker! These frames are saved to %localappdata%\<game_name>\frames. You can find
+or change your game name using the instructions in the "Documentation" note. These frames
+can be assembled using the following Python script:
+
+```python
+import cv2 # Video assembly
+import os # needed for some file operations
+import glob # used to discover frames
+
+# HEY!!! READ THIS NOTE!!!!!
+# I recommend playing this video back in VLC with the window resized to exactly 640x480.
+# Otherwise THE VIDEO MAY BE BLURRY AND INACCURATE. THIS IS NOT A PROBLEM WITH THE VIDEO FILE.
+# You can take measurements using PowerToys and the screen ruler. That's how I do it, anyway.
+# In VLC, you can press E to advance one frame
+
+# paths
+frames_folder = os.path.expandvars(r"%localappdata%\YourGameNameHere\frames")
+output = os.path.expandvars(r"%userprofile%\Desktop\output.mkv") # The MKV file format is important here!!
+
+# frames
+print("Getting list of frames...")
+frames = sorted(glob.glob(os.path.join(frames_folder, "frame_*.png")), key=lambda x: int(os.path.splitext(os.path.basename(x))[0].split('_')[1]))
+
+print("done")
+print("Assembling into file...")
+print("This can take a while. For me, 16000 frames took about 10 minutes.")
+
+if not frames:
+    raise RuntimeError("error: no frames found in folder!")
+
+out = cv2.VideoWriter(output, cv2.VideoWriter_fourcc(*'FFV1'), 30, (640, 480))
+# Explanation of the above code:
+# output - the output filename
+# cv2.VideoWriter_fourcc(*'FFV1') - FFV1 is a lossless codec, great for this
+# 30 - the fps
+# (640, 480) - the width and height of the window
+# You might have to tweak these values.
+
+for frame_path in frames:
+    img = cv2.imread(frame_path)
+    out.write(img)
+
+out.release() # done
+print(f"SUCCESS: Video saved as \"{output}\"!")
+```
+
+You can download Python at https://www.python.org/downloads. The comments explain what this code does!
+Just make sure to replace YourGameNameHere with the actual project name.
+
+Lossless Recording is disabled by default.

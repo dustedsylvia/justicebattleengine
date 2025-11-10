@@ -1,0 +1,13 @@
+{
+  "$GMNotes":"v1",
+  "%Name":"Documentation",
+  "name":"Documentation",
+  "openedOnFirstLoad":true,
+  "parent":{
+    "name":"Notes",
+    "path":"folders/Notes.yy",
+  },
+  "resourceType":"GMNotes",
+  "resourceVersion":"2.0",
+  "shouldOpenOnLoad":true,
+}
